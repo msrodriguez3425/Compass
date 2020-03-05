@@ -16,7 +16,7 @@ from splinter import Browser
 import win32com.client
 
 def click_on_something(strings,types_,first = False,by_text = '',used_already = [],truncated = False,last = False):
-    found = False
+    found = False 
     my_dict = {}
     my_dict["strings"] = strings
     my_dict["types"] = types_
@@ -37,7 +37,7 @@ def click_on_something(strings,types_,first = False,by_text = '',used_already = 
                     blah = f".{my_dict['strings'][i]}"
                     to_click = to_click.find_by_css(blah)
                     #In the case of selecting boundlists, must select the one that hasent been used yet
-                    if used_already and (my_dict['strings'][i] == 'x-boundlist' or my_dict["strings"][i] == "list-ct"):
+                    if used_already and (my_dict['strings'][i] in ['x-boundlist','x-boundlist-list-ct', 'list-ct']):
                         for obj in to_click:
                             if obj not in used_already:
                                 to_click = obj
@@ -284,9 +284,264 @@ def scrape(num_,browser,app_dict):
     df =pd.DataFrame(the_dict)
     return df
 
+def scrape2(num_,browser,app_dict):
+    browser.visit(f'{base_url}{app_dict["url"][num_]}')
+    
+    #Clicking on Series tab
+    loaded = False  
+    while loaded == False:
+        try:
+            click_on_something(["tab-1013"],["id"])
+            try:
+                series_drop = click_on_something(["cmp_series_SERIE-triggerWrap","x-trigger-index-0"],["id","css"])
+                loaded = True
+            except:
+                click_on_something(["tab-1012"],["id"])
+                print("walao")
+        except:
+            pass
+        
+    #Clicking the todas las series button
+    #select_all = browser.find_by_css(".list-ct").find_by_css(".x-column-header-text").first
+    #select_all.click()
+    series_clicked = False
+    while series_clicked == False:
+        print(f'test{len(browser.find_by_css(".list-ct"))}')
+        click_on_something(["list-ct","x-column-header-text"],["css","css"],0)
+        test = browser.find_by_id("cmp_series_SERIE-inputEl")._element.get_attribute('value')
+        if test:
+            series_clicked = True
+
+    #clicking the serie drop_down
+    unclicked = False
+    while unclicked == False:
+        try:
+            series_drop.click()
+            unclicked = True
+        except:
+            pass
+    
+    used_already = []
+    used_already = add_to_used(used_already,browser.find_by_css(".list-ct"))
+    #This if is for tables in which there exists the option to select titulos
+    if app_dict["titulos"][num_]:
+        #Clicking the Títulos drop down
+        tit_drop_clicked = False
+        while tit_drop_clicked == False:
+            try:
+                titulos_drop = click_on_something(["cmp_serie_matriz-triggerWrap","x-trigger-index-0"],["id","css"])
+                tit_drop_clicked = True
+            except:
+                pass
+
+        #Clicking the todos los titulos button
+        titulos_clicked = False
+        while titulos_clicked == False:
+            click_on_something(["list-ct","x-column-header-text"],["css","css"],0,'',used_already)
+            test = browser.find_by_id("cmp_serie_matriz-inputEl")._element.get_attribute('value')
+            if test:
+                titulos_clicked = True
+            
+        #Unclicking the titulos drop_down
+        unclicked = False
+        while unclicked == False:
+            try:
+                titulos_drop.click()
+                unclicked = True
+            except:
+                pass
+        used_already = add_to_used(used_already,browser.find_by_css(".list-ct"))
+    #Clicking back on the Cuadros tab.
+    click_on_something(["tab-1012"],["id"])
+            
+            
+    # #clicking cifras drop_down
+    # cifras_drop_clicked = False
+    # while cifras_drop_clicked == False:
+    #     try:
+    #         cifras_drop = click_on_something(["cmp_cuadro_PRESENTACION","x-trigger-index-0"],["id","css"])
+    #         cifras_drop_clicked = True
+    #     except:
+    #         pass    
+
+    # #Clicking on Porcentaje del PIB
+    # cifras_opts = click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],False,"Porcentaje",used_already,True)
+    
+    # #Clicking back on the Cuadros tab.
+    # click_on_something(["tab-1012"],["id"])
+            
+    #Clicking the cuadro drop-down
+    loaded = False
+    while loaded == False:
+        try:
+            click_on_something(["cmp_cuadro_CUADRO-bodyEl","x-trigger-index-0"],["id","css"])
+            loaded = True
+        except:
+            print("walao")
+    
+    
+    
+    #Clicking on Saldo multianual option
+    saldo_clicked = False
+    while saldo_clicked == False:
+        try:
+            click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],False,"Saldo",[],True)
+            saldo_clicked = True                
+        except:
+            pass
+        
+    
+    used_already = add_to_used(used_already,browser.find_by_css(".x-boundlist"))
+    used_already  
+    
+    #Clickig on Cifras drop down
+    cifras_drop_clicked = False
+    while cifras_drop_clicked == False:
+        try:
+            browser.find_by_id("cmp_cuadro_PRESENTACION").find_by_css(".x-form-trigger").click()
+            cifras_drop_clicked = True
+        except:
+            pass
+            
+    #Clicking on porcentajes del PIB
+    cifras_opts = click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],False,"Porcentajes",used_already,True)
+
+    #Upon clicking the dropdown, an x-boundlist is generated, must add it to used_aleady to we dont use it again
+    used_already = add_to_used(used_already,browser.find_by_css(".x-boundlist"))
+    used_already
+    
+    #bleb
+    #Clicking on Series tab
+    loaded = False  
+    while loaded == False:
+        try:
+            click_on_something(["tab-1013"],["id"])
+            loaded = True
+        except:
+            print("walao")
+      
+    #clicking cifras drop_down
+    cifras_drop_clicked = False
+    while cifras_drop_clicked == False:
+        try:
+            cifras_drop = click_on_something(["cmp_cuadro_PRESENTACION","x-trigger-index-0"],["id","css"])
+            cifras_drop_clicked = True
+        except:
+            pass
+              
+    #Clicking on porcentajes del PIB
+    cifras_opts = click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],False,"Porcentajes",used_already,True)
+
+    #Upon clicking the dropdown, an x-boundlist is generated, must add it to used_aleady to we dont use it again
+    used_already = add_to_used(used_already,browser.find_by_css(".x-boundlist"))
+    used_already
+              
+    #Clicking on year lower limit drop down
+    #low_lim_drop = browser.find_by_id("cmp_cuadro_DE").find_by_css(".x-trigger-cell").find_by_css(".x-trigger-index-0")
+    #low_lim_drop.click()
+    low_lim_clicked = False
+    while low_lim_clicked == False:
+        try:
+            low_lim_drop = click_on_something(["cmp_cuadro_DE","x-trigger-cell","x-trigger-index-0"],["id","css","css"])
+            low_lim_clicked = True
+        except:
+            print("not found yet...")
+              
+    #Clicking on the earliest year in the low_lim_opts option menu
+    low_lim_opts = click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],False,'',used_already,False,True)
+              
+    #adding bound list generated by clicking low_lim_drop to used_already
+    used_already = add_to_used(used_already,browser.find_by_css(".x-boundlist"))
+    used_already
+              
+    #Clicking on year upper limit drop down
+    #up_lim_drop = browser.find_by_id("cmp_cuadro_A").find_by_css(".x-trigger-index-0")
+    #up_lim_drop.click()
+    up_lim_clicked = False
+    while up_lim_clicked == False:
+        try:
+            up_lim_drop = click_on_something(["cmp_cuadro_A","x-trigger-index-0"],["id","css"])
+            up_lim_clicked = True
+        except:
+            print("not found yet...")
+
+    #Clicking on the latest year in the up_lim_opts option menu
+    up_lim_opts = click_on_something(["x-boundlist","x-boundlist-item"],["css","css"],True,'',used_already)
+    #adding bound list generated by clicking low_lim_drop to used_already
+    used_already = add_to_used(used_already,browser.find_by_css(".x-boundlist"))
+    used_already
+              
+    #Consultar Series (clicking the button and suppressing warnings until the page loads the data)
+    #consultar_series = browser.find_by_id("cmp_series_CONSULTAR_SERIES-btnEl")
+    #consultar_series.click()
+    success = False
+    while success == False:
+        clicked = False
+        try:
+            consultar_series = click_on_something(["cmp_series_CONSULTAR_SERIES-btnEl"],["id"])
+            clicked = True
+            print("consultar button clicked")
+        except:
+            print("no consultar button")
+        if clicked == True:
+            try:
+                alert = browser.get_alert()
+                alert.accept()
+                print("alert accepted")
+            except:
+                print("there is no alert")
+                time.sleep(0.5)
+                test = browser.find_by_css(".x-mask-msg")
+                #Sometimes the button isnt clicked, thus...
+                print(f'test = {test}')
+                if test == []:
+                    consultar_series = click_on_something(["cmp_series_CONSULTAR_SERIES-btnEl"],["id"])
+                    print("had to click again")
+                success = True
+              
+    loaded = False
+    while loaded == False:
+        try:
+            the_table = browser.find_by_id("GridSeries")
+            header_row = the_table.find_by_css(".x-box-inner")[1]
+            loaded = True
+        except:
+            print("loading...")
+            #sometimes the consultar button isnt clicked in the previous step, thus...
+
+    #Finding Headers of the table
+    header_divs = header_row.find_by_css(".x-unselectable")
+    idx = 0
+    headers = []
+    for header in header_divs:
+        if idx == 0:
+            headers.append(header.find_by_tag("span").find_by_tag("label")._element.get_attribute("innerHTML").strip())
+            idx += 1
+        else:
+            headers.append(header.find_by_tag("span")._element.get_attribute("innerHTML").replace("\n","").replace("\r","").strip())
+    #Scraping the data and creating a data frame
+    table_large = the_table.find_by_id("GridSeries-body")
+
+    table = table_large.find_by_tag("table")
+
+    rows = table.find_by_tag("tr")
+
+    data_rows = list(rows)[1:]
+
+    the_dict = dict((el,[]) for el in headers)
+
+    for row in data_rows:
+        to_append = row.text.split("\n")
+        for k in range(0,len(the_dict)):
+            the_dict[headers[k]].append(to_append[k]) 
+
+    df =pd.DataFrame(the_dict)
+    return df
+
 def store(df_dict):   
     
     #Loading the excel file
+    print("Loading test2 file...")
     wb = load_workbook(filename='N:/Lsolis/eco/SHCP/Historicos/test2.xlsm', read_only=False, keep_vba=True)
     idx = 0
     
@@ -343,7 +598,7 @@ def store(df_dict):
         if stripped_col_heads == compare2:
             pass
         else:
-            print(f"sheet column headers don't agree with scraped scraped column headers")
+            print(f"sheet column headers don't agree with scraped column headers")
             break
 
         row_height = 12
@@ -391,6 +646,7 @@ def store(df_dict):
             print(f"column {col} out of {len(stripped_col_heads)} inserted successfully")
         idx += 1
     print("Finished insertion of data.")
+    print("Saving test2 file...")
     wb.save(filename = 'N:/Lsolis/eco/SHCP/Historicos/test2.xlsm')
     print("Data was stored in test2")
 
@@ -421,10 +677,11 @@ def scraped_to_official():
     print("Loading official file...")
     wb = xl.Workbooks.Open("N:/Lsolis/eco/SHCP/Historicos/2Deuda_publica.xlsm")
     
-    print(" Running macros...")
+    print("Running macros...")
     xl.Application.Run("2Deuda_publica.xlsm!CopyPIBSheetsFromScrapedData")
     xl.Application.Run("2Deuda_publica.xlsm!textToNumber")
-
+    
+    print("Saving official file...")
     wb.Save()
     wb.Close()
     del xl
@@ -469,6 +726,35 @@ app_dict = {
     ]
 }
 
+#This dict (app_dict2) contains the links to the PIB data thats in a format that requires a different scraping method
+# to those which are listed in the dict above (app_dict)
+app_dict2 = {
+    "title":[
+        "Deuda Interna del Sector Público Federal",
+        "Deuda Externa del Sector Público Federal",
+        "Deuda Interna del Gobierno Federal",
+        "Deuda Externa del Gobierno Federal"
+    ],
+    "url":[
+        "Deuda%20Interna%20del%20Sector%20P%C3%BAblico%20Federal&param_formato=1&param_unidad=1&param_tipo=2&param_lenguaje=1&param_clasificacion=7&",
+        "Deuda%20Externa%20del%20Sector%20P%C3%BAblico%20Federal&param_formato=2&param_unidad=1&param_tipo=2&param_lenguaje=1&param_clasificacion=7&",
+        "Deuda%20Interna%20del%20Gobierno%20Federal&param_formato=1&param_unidad=1&param_tipo=2&param_lenguaje=1&param_clasificacion=6&",
+        "Deuda%20Externa%20del%20Gobierno%20Federal&param_formato=2&param_unidad=1&param_tipo=2&param_lenguaje=1&param_clasificacion=6&"
+    ],
+    "sheet":[
+        "2.1.1PIB",
+        "2.1.2PIB",
+        "2.2.1PIB",
+        "2.2.2PIB"
+    ],
+    "titulos":[
+        True,
+        True,
+        True,
+        True
+    ]
+}
+
 executable_path = {'executable_path': 'chromedriver.exe'}
 browser = Browser('chrome', **executable_path, headless=False)
 base_url = "http://presto.hacienda.gob.mx/presto/files/system/mashlets/app_layout_estopor/index.html?param_formato_desc="
@@ -479,12 +765,23 @@ df_dict = {
     "sheet":[]
 }
 
+
+
+#first we scrape the PIB data thats in the normal format. We call the scrape function.
 for i in range(0,len(app_dict["title"])):
     df = scrape(i,browser,app_dict)
     title = browser.find_by_css(".cls-title-table").find_by_css(".cls-title-main").text
     df_dict["title"].append(title)
     df_dict["df"].append(df)
     df_dict["sheet"].append(app_dict["sheet"][i])
+
+#then we scrape the PIB data thats in the other format. We call the scrape 2 function
+for i in range(0,len(app_dict2["title"])):
+    df = scrape2(i,browser,app_dict2)
+    title = browser.find_by_css(".cls-title-table").find_by_css(".cls-title-main").text
+    df_dict["title"].append(title)
+    df_dict["df"].append(df)
+    df_dict["sheet"].append(app_dict2["sheet"][i])
 
 
 
