@@ -551,6 +551,8 @@ scraped_to_official()
 if to_download:
     print("\n\n\n")
     print("IMPORTANT: please download the following tables by hand...")
+    print("\n")
     for table in to_download:
-        print(table)
-    print(f"SHCP inserted a new column in these tables. Download by hand and replace in test2.xlsm with exact same format as other tables (column numbers on top, headers on row 3), save, and execute this script again.")
+        print(f'--- {table}')
+    print("\n")
+    print(f"SHCP inserted a new column in these tables. Download by hand and replace in test2.xlsm with exact same format as other tables (column numbers on top, headers on row 3), save and close test2.xlsm, and execute this script again. At this time, the rest of the tables have been updated as normal.")
