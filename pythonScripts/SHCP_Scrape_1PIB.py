@@ -280,9 +280,10 @@ def scrape(num_,browser,app_dict):
 def store(df_dict):   
     
     #Loading the excel file
+    print("Loading test.xlsm...")
     wb = load_workbook(filename='N:/Lsolis/eco/SHCP/Historicos/test.xlsm', read_only=False, keep_vba=True)
     idx = 0
-    
+    plsDownloadManually = []
     for worksheet in df_dict["sheet"]:
         #Loading the sheet
         sheet_ranges = wb[worksheet]
@@ -334,58 +335,61 @@ def store(df_dict):
 
         #comparing the sheet columns to the scraped columns
         if stripped_col_heads == compare2:
-            pass
+            headers_agree = True
         else:
-            print(f"sheet column headers don't agree with scraped scraped column headers")
-            break
+            plsDownloadManually.append(worksheet)
+            headers_agree = False
+            print(f"excel sheet column headers don't agree with scraped column headers. Download {worksheet} by hand and replace in test.xlsm with exact same format as other tables (column numbers on top, headers on row 3).")
 
-        row_height = 12
-        for col in range(1, len(stripped_col_heads) + 1):
-            for rw in range(ins_begin, ins_end + 1):
-                sheet_ranges.cell(rw,col).value = df_dict["df"][idx][stripped_col_heads[col - 1]][rw-ins_begin]
-                sheet_ranges.cell(rw,col).number_format = '#.0'
-
-                #setting font style and size    
-                sheet_ranges.cell(rw,col).font = Font(name='Arial', size=9)
-
-                #setting border of cell
-                border = Border(left=Side(border_style='thin', color='E4E4E4'),
-                                right=Side(border_style='thin', color='E4E4E4'),
-                                top=Side(border_style='thin', color='E4E4E4'),
-                                bottom=Side(border_style='thin', color='E4E4E4'))
-                sheet_ranges.cell(rw,col).border = border
-
-                #setting alignment of text in cell
-                alignment=Alignment(horizontal='right',
-                                    vertical='top')
-                sheet_ranges.cell(rw,col).alignment = alignment
-
-                #setting row height
-                sheet_ranges.row_dimensions[rw].height = row_height
-
-                #setting fill color of cell
-                greyFill = PatternFill(start_color='DCDCDC',
-                            end_color='DCDCDC',
-                            fill_type='solid')
-                whiteFill = PatternFill(start_color='FFFFFF',
-                    end_color='FFFFFF',
-                    fill_type='solid')
-                #Grey/White/Grey/White
-                if rw % 2 == 0:
-                    sheet_ranges.cell(rw,col).fill = greyFill 
-                else:
-                    sheet_ranges.cell(rw,col).fill = whiteFill
-            #Setting row heights of rows below data
-            hgts = [12, 24, 15, 15, 15, 15, 15, 40, 40, 40, 15, 40, 12]
-            hgt_idx = 0
-            for rw in range(ins_end + 1,ins_end + 13):
-                sheet_ranges.row_dimensions[rw].height = hgts[hgt_idx] 
-                hgt_idx += 1
-            print(f"column {col} out of {len(stripped_col_heads)} inserted successfully")
+        if headers_agree:
+            row_height = 12
+            for col in range(1, len(stripped_col_heads) + 1):
+                for rw in range(ins_begin, ins_end + 1):
+                    sheet_ranges.cell(rw,col).value = df_dict["df"][idx][stripped_col_heads[col - 1]][rw-ins_begin]
+                    sheet_ranges.cell(rw,col).number_format = '#.0'
+    
+                    #setting font style and size    
+                    sheet_ranges.cell(rw,col).font = Font(name='Arial', size=9)
+    
+                    #setting border of cell
+                    border = Border(left=Side(border_style='thin', color='E4E4E4'),
+                                    right=Side(border_style='thin', color='E4E4E4'),
+                                    top=Side(border_style='thin', color='E4E4E4'),
+                                    bottom=Side(border_style='thin', color='E4E4E4'))
+                    sheet_ranges.cell(rw,col).border = border
+    
+                    #setting alignment of text in cell
+                    alignment=Alignment(horizontal='right',
+                                        vertical='top')
+                    sheet_ranges.cell(rw,col).alignment = alignment
+    
+                    #setting row height
+                    sheet_ranges.row_dimensions[rw].height = row_height
+    
+                    #setting fill color of cell
+                    greyFill = PatternFill(start_color='DCDCDC',
+                                end_color='DCDCDC',
+                                fill_type='solid')
+                    whiteFill = PatternFill(start_color='FFFFFF',
+                        end_color='FFFFFF',
+                        fill_type='solid')
+                    #Grey/White/Grey/White
+                    if rw % 2 == 0:
+                        sheet_ranges.cell(rw,col).fill = greyFill 
+                    else:
+                        sheet_ranges.cell(rw,col).fill = whiteFill
+                #Setting row heights of rows below data
+                hgts = [12, 24, 15, 15, 15, 15, 15, 40, 40, 40, 15, 40, 12]
+                hgt_idx = 0
+                for rw in range(ins_end + 1,ins_end + 13):
+                    sheet_ranges.row_dimensions[rw].height = hgts[hgt_idx] 
+                    hgt_idx += 1
+                print(f"column {col} out of {len(stripped_col_heads)} inserted successfully")
         idx += 1
-    print("Finished insertion of data.")
+    print("Saving test.xlsm...")
     wb.save(filename = 'N:/Lsolis/eco/SHCP/Historicos/test.xlsm')
-    print("Data was stored in test.")
+    print("Data was stored in test.xlsm")
+    return plsDownloadManually
     
 def add_to_used(used_already,xboundlists):
     for lst in xboundlists:
@@ -568,6 +572,30 @@ for i in range(0,len(app_dict["title"])):
     df_dict["df"].append(df)
     df_dict["sheet"].append(app_dict["sheet"][i])
 
-store(df_dict)
+to_download = store(df_dict)
 
 scraped_to_official()
+
+if to_download:
+    print("\n\n\n")
+    print("IMPORTANT: please download the following tables by hand...")
+    print("\n")
+    for table in to_download:
+        print(f'--- {table}')
+    print("\n")
+    print(f"SHCP inserted a new column in these tables. Download by hand and replace in test.xlsm with exact same format as other tables (column numbers on top, headers on row 3), save and close test.xlsm, and execute this script again. At this time, the rest of the tables have been updated as normal.")
+    print("\n")
+    print("To download a table(s): \n ")
+    print("-- Go to http://www.shcp.gob.mx/POLITICAFINANCIERA/FINANZASPUBLICAS/Estadisticas_Oportunas_Finanzas_Publicas/Paginas/unica2.aspx")
+    print("-- Open needed table: example 1.3.15PIB -- > 1 means first tab in 2nd row i.e. Ingreso, gasto y financiamieto del sector público, 3 means 3rd tab of 3rd row i.e. Gastos Presupuestarios, 15 means 15th available table i.e. Principales Beneficiarios de Transferencias del Gobierno Federal Calsifición Funcional.")
+    print("-- Select Series tab")
+    print("-- Select Series drop down, select Todas las series")
+    print("-- Select Cifras drop down, select Porcentajes del PIB")
+    print("-- Select De drop down, select earliest year available")
+    print("-- Select A drop down, select latest year available")
+    print("-- Click Consultar Series")
+    print("-- Click Exportar Excel")
+    print("-- Open downloaded file")
+    print("-- Insert row on top, number columns (starting with 1 at column A until last column)")
+    print("-- Replace in test.xlsm with the appropriate sheet name i.e. 1.3.15PIB")
+    print("-- Save and close test.xlsm")  

@@ -571,5 +571,5 @@ if to_download:
     print("-- Click Exportar Excel")
     print("-- Open downloaded file")
     print("-- Insert row on top, number columns (starting with 1 at column A until last column)")
-    print("-- Replace in test.xlsm with the appropriate sheet name i.e. 2.1.3S")
-    print("-- Save and close test.xlsm")  
+    print("-- Replace in test2.xlsm with the appropriate sheet name i.e. 2.1.3S")
+    print("-- Save and close test2.xlsm")  
