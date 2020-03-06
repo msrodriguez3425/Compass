@@ -326,7 +326,7 @@ def store(df_dict):
 
         #insert rows if there are rows to be inserted        
         if len(df_dict["df"][idx]) > (last_row-last_row_2previous):
-            sheet_ranges.insert_rows(last_row + 1, len(df_dict["df"][idx])-(last_row - last_2row_previous))
+            sheet_ranges.insert_rows(last_row + 1, len(df_dict["df"][idx])-(last_row - last_row_2previous))
             print(f'{len(df_dict["df"][idx]) - (last_row-last_row_2previous)} rows were inserted.')
 
         #finding row range to which values will be inserted
