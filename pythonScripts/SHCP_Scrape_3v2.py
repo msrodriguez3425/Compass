@@ -283,6 +283,7 @@ def scrape(num_,browser,app_dict):
 
 def store(df_dict):
     #Loading the excel file
+    print("Loading test3.xlsm...")
     wb = load_workbook(filename='N:/Lsolis/eco/SHCP/Historicos/test3.xlsm', read_only=False, keep_vba=True)
     idx = 0
     plsDownloadManually = []
@@ -420,6 +421,7 @@ def store(df_dict):
                         sheet_ranges.cell(rw,col).fill = whiteFill
                 print(f"column {col} out of {len(stripped_col_heads)} inserted successfully")
         idx += 1
+    print("Saving test3.xlsm...")
     wb.save(filename = 'N:/Lsolis/eco/SHCP/Historicos/test3.xlsm')
     print("Data was stored in test3.")
     return plsDownloadManually

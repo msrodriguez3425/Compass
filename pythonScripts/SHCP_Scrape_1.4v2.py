@@ -404,7 +404,7 @@ def store(df_dict):
                         sheet_ranges.cell(rw,col).fill = whiteFill
                 print(f"column {col} out of {len(stripped_col_heads)} inserted successfully")
         idx += 1
-
+    print("Saving test.xlsm...")
     wb.save(filename = 'N:/Lsolis/eco/SHCP/Historicos/test.xlsm')
     print("test.xlsm saved")
     return plsDownloadManually
