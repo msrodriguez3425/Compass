@@ -422,10 +422,18 @@ def scraped_to_official():
     xl.Application.Run("1Ingreso_gasto_fincanc_sector_publico.xlsm!CopyPIBSheetsFromScrapedData")
     xl.Application.Run("1Ingreso_gasto_fincanc_sector_publico.xlsm!textToNumber")
 
-    wb.Save()
-    wb.Close()
+    try:
+        wb.Save()
+        wb.Close()
+        macro_run = True
+    except:
+        macro_run = False
     del xl
-    print("Finished!")
+    
+    if macro_run:
+        print("Finished!")
+    else:
+        print("Finished!    ------ BUT!! Must run excel Macros CopyPIBSheetsFromScrapedData and textToNumber manually from visual basic in 1Ingreso_gasto_fincanc_sector_publico.xlsm.")
 
 app_dict = {
     "title":[

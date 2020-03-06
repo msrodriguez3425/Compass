@@ -683,11 +683,18 @@ def scraped_to_official():
     xl.Application.Run("2Deuda_publica.xlsm!CopyPIBSheetsFromScrapedData")
     xl.Application.Run("2Deuda_publica.xlsm!textToNumber")
     
-    print("Saving official file...")
-    wb.Save()
-    wb.Close()
+    try:
+        wb.Save()
+        wb.Close()
+        macro_run = True
+    except:
+        macro_run = False
     del xl
-    print("Finished!")
+    
+    if macro_run:
+        print("Finished!")
+    else:
+        print("Finished!    ------ BUT!! Must run excel Macros CopyPIBSheetsFromScrapedData and textToNumber manually from visual basic in 2Deuda_publica.xlsm.")
 
 app_dict = {
     "title":[
