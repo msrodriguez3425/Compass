@@ -534,7 +534,7 @@ for i in range(0,len(app_dict["title"])):
     df_dict["df"].append(df)
     df_dict["sheet"].append(app_dict["sheet"][i])
 
-to download = store(df_dict)
+to_download = store(df_dict)
 
 scraped_to_official()
 
